@@ -18,6 +18,9 @@
 #define IO_MAX 0x20000000
 
 
+#include "register.h"
+#include "csr.h"
+
 
 class RISCVCpu {
 
@@ -32,6 +35,7 @@ private:
     iec alu(rType ri);
     iec lui(uType ui);
     iec auipc(uType ui);
+    iec csr_instr(iType csri);
 
     // access Memory mapped devices
     uint32_t read_io(F3_LoadOp op, uint32_t addr, iec& excep ) ;
@@ -50,7 +54,7 @@ protected:
     void execute(Instruction i);
     void exception(InstructionExceptionCode code);
     int check_local_interrupt();
-    void interupt();
+    void interrupt(bool exeption, uint32_t interrupt_cause);
 
 
 public:

@@ -3,6 +3,7 @@
 //
 
 #include "RISCVCpu.h"
+#include "csr.h"
 
 Instruction RISCVCpu::fetch() {
     Instruction i;
@@ -31,6 +32,8 @@ iec RISCVCpu::run_instruction(Instruction i) {
             return jal(i.j);
         case JALR:
             return jalr(i.i);
+        case CSR:
+            return csr_instr(i.i);
         default:
             return iec::Illegal;
     }
@@ -39,7 +42,14 @@ iec RISCVCpu::run_instruction(Instruction i) {
 void RISCVCpu::execute(Instruction i) {
     auto o = (Opcode)i.d.opcode;
 
-    run_instruction(i);
+    check_local_interrupt();
+
+    iec exept = run_instruction(i);
+
+    if (exept!= iec::IEC_OK) {
+        exception(exept);
+        return;
+    }
 
     if ( !(o == JAL || o == JALR || o == BRANCH) ) {
         pc+=4; //increment pc if not branch or jump
@@ -236,3 +246,87 @@ iec RISCVCpu::branch(bType bi) {
     }
 }
 
+void RISCVCpu::interrupt(bool exeption, uint32_t interrupt_cause) {
+
+    uint32_t m_cause = interrupt_cause | (exeption << 31);
+    csr[CSR_MSCRATCH] = r_sp;
+    csr[CSR_MEPC] = pc;
+    csr[CSR_MSCAUSE] = m_cause;
+    pc = csr[CSR_MTVEC];
+
+}
+
+iec RISCVCpu::csr_instr(iType csri) {
+
+    uint32_t _swap;
+    auto f3 = (F3_System)csri.func3;
+    switch (f3) {
+        case F3_System::ECALL:
+            if(csri.imm == 1) { pc = 0; } //stop program  //EBREAK
+            return iec::ECALL_M;
+
+        case F3_System::CSR_RW:
+            _swap = csr[csri.imm];
+            csr[csri.imm] = x[csri.rs1];
+            x[csri.rd] = _swap;
+            return iec::IEC_OK;
+
+        case F3_System::CSR_RS:
+            _swap = csr[csri.imm];
+            csr[csri.imm] |= x[csri.rs1];
+            x[csri.rd] = _swap;
+            return iec::IEC_OK;
+
+        case F3_System::CSR_RC:
+            _swap = csr[csri.imm];
+            csr[csri.imm] ^= x[csri.rs1];
+            x[csri.rd] = _swap;
+            return iec::IEC_OK;
+
+        case F3_System::CSR_RWI:
+            _swap = csr[csri.imm];
+            csr[csri.imm] = csri.rs1;
+            x[csri.rd] = _swap;
+            return iec::IEC_OK;
+
+        case F3_System::CSR_RSI:
+            _swap = csr[csri.imm];
+            csr[csri.imm] |= csri.rs1;
+            x[csri.rd] = _swap;
+            return iec::IEC_OK;
+
+        case F3_System::CSR_RCI:
+            _swap = csr[csri.imm];
+            csr[csri.imm] ^= csri.rs1;
+            x[csri.rd] = _swap;
+            return iec::IEC_OK;
+
+        default:
+            // we should never be here
+            return iec::Illegal;
+    }
+
+}
+
+int RISCVCpu::check_local_interrupt() {
+
+    uint32_t mip = csr[CSR_MIP];
+    uint32_t mie = csr[CSR_MIE];
+    mip &= mie;
+
+    switch (mip) {
+        case 1<<3:
+            interrupt(false, 3);  //Software interrupt
+            break;
+        case 1<<7:
+            interrupt(false, 7);  //Timer interrupt
+            break;
+        case 1<<11:
+            interrupt(false, 11);  //External interrupt
+            break;
+    }
+
+
+
+
+}
