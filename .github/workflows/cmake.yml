@@ -23,7 +23,7 @@ jobs:
     - name: Get RISCV-32I Cross Toolchain
       run: wget https://github.com/stnolting/riscv-gcc-prebuilt/releases/download/rv32i-1.0.0/riscv32-unknown-elf.gcc-10.1.0.rv32i.ilp32.newlib.tar.gz
     - name: Install RISCV-32I Cross Toolchain
-      run: sudo mkdir /opt/riscv && sudo tar -xzf TOOLCHAIN.tar.gz -C /opt/riscv/ && export PATH=$PATH:/opt/riscv/bin
+      run: sudo mkdir /opt/riscv && sudo tar -xzf riscv32-unknown-elf.gcc-10.1.0.rv32i.ilp32.newlib.tar.gz -C /opt/riscv/ && export PATH=$PATH:/opt/riscv/bin
     
     - name: Create Build Environment
       # Some projects don't allow in-source building, so create a separate build directory
