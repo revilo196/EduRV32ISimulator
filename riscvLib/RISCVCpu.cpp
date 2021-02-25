@@ -92,7 +92,7 @@ void RISCVCpu::resetCpu() {
     pc = 0;
 }
 
-void RISCVCpu::run() {
+void RISCVCpu::single_step() {
     Instruction  i = fetch();
     execute(i);
     instuction_count++;

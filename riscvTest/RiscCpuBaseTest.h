@@ -28,7 +28,7 @@ public:
     }
     void SetUp() override {
         init_mem();
-        start(0x0000);
+        entry(0x0000);
     }
     void TearDown() override {
         resetCpu();

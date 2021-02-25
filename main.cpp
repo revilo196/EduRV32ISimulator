@@ -23,11 +23,11 @@ int main(int argc, char const *argv[])
     RISCVCpu cpu(&mem);
 
     cpu.resetCpu();
-    cpu.start(mem.entry);
+    cpu.entry(mem.entry);
 
     while (cpu.getPC() != 0) {
         printf("PC: %x\n", cpu.getPC());
-        cpu.run();
+        cpu.single_step();
     }
 
     return 0;

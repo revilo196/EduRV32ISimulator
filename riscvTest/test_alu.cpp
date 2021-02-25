@@ -10,7 +10,7 @@ public:
     Instruction i{};
     ALUTest();
     void SetUp() override {
-        start(0x8000);
+        entry(0x8000);
     };
     void TearDown() override {
         resetCpu();

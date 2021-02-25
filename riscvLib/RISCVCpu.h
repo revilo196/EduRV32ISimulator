@@ -22,6 +22,7 @@
 class RISCVCpu {
 
 private:
+    // private functions to delegate opcodes
     iec load(iType li);
     iec store(sType si);
     iec branch(bType bi);
@@ -31,11 +32,14 @@ private:
     iec alu(rType ri);
     iec lui(uType ui);
     iec auipc(uType ui);
+
+    // access Memory mapped devices
     uint32_t read_io(F3_LoadOp op, uint32_t addr, iec& excep ) ;
     iec write_io(F3_StoreOp op, uint32_t addr, uint32_t value);
 
 protected:
     RISCVMemory * memory;
+    std::vector<MemoryMappedIO*> mmio;
     uint32_t x[32]{};
     uint32_t pc{};
     uint32_t instuction_count{};
@@ -47,13 +51,13 @@ protected:
     void exception(InstructionExceptionCode code);
     int check_local_interrupt();
     void interupt();
-    std::vector<MemoryMappedIO*> mmio;
+
 
 public:
     explicit RISCVCpu(RISCVMemory* mem)  {this->memory = mem;}
     void resetCpu();
-    void run();
-    void start(uint32_t pc_start) { this->pc = pc_start;}
+    void single_step();
+    void entry(uint32_t pc_start) { this->pc = pc_start;}
     uint32_t getPC() const {return pc;}
     void add_mmio(MemoryMappedIO * m) {mmio.push_back(m);}
 
