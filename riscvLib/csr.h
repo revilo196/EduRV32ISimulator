@@ -73,7 +73,34 @@
 #define CSR_VSCAUSE      0x242
 #define CSR_VSTVAL       0x243
 #define CSR_VSIP         0x244
-#define CSR_VSATP        0x280
 
+#define CSR_MSTATUS     0x300
+#define CSR_MIE         0x304
+#define CSR_MTVEC       0x305
+#define CSR_MSCRATCH    0x340
+#define CSR_MEPC        0x341
+#define CSR_MSCAUSE      0x342
+#define CSR_MTVAL       0x343
+#define CSR_MIP         0x344
+
+typedef struct mix_s_ {
+    bool usix : 1;
+    bool ssix : 1;
+    bool hsix : 1;
+    bool msix : 1;
+    bool utix : 1;
+    bool stix : 1;
+    bool htix : 1;
+    bool mtix : 1;
+    bool ueix : 1;
+    bool seix : 1;
+    bool heix : 1;
+    bool meix : 1;
+} mix_s_t;
+
+typedef union mix_union_ {
+    uint32_t u;
+    mix_s_t r;
+} mix_union;
 
 #endif //OW_RISCV_EMU_CSR_H

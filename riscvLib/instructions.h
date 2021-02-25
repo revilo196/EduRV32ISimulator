@@ -133,7 +133,7 @@ typedef enum {A_ADD = 0, A_SLL=1, A_SLT = 2, A_SLTU = 3, A_XOR = 4, A_SRL =5, A_
 typedef enum {L_BYTE = 0, L_HALF = 1, L_WORD = 2, L_UBYTE = 4, L_UHALF = 5} F3_LoadOp;
 typedef enum {S_BYTE = 0, S_HALF = 1, S_WORD = 2} F3_StoreOp;
 typedef enum {B_BEQ = 0, B_BNE = 1, B_BLT = 4, B_BGE = 5, B_BLTU = 6, B_BGEU = 7} F3_BranchOp;
-
+typedef enum {ECALL=0 , CSR_RW=1, CSR_RS=2, CSR_RC=3, CSR_RWI=5, CSR_RSI=6, CSR_RCI=7} F3_System;
 /**
  * enum for Exception cause (-1 used for no Exception)
  */
