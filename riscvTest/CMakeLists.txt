@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.7)
 project(ow_riscv_emu)
-
+enable_testing()
 
 # Download and unpack googletest at configure time
 configure_file(CMakeLists.txt.in googletest-download/CMakeLists.txt)
@@ -35,3 +35,5 @@ add_dependencies(riscvTest gtest)
 add_dependencies(riscvTest risc-native-test)
 target_link_libraries(riscvTest gtest)
 target_link_libraries(riscvTest riscvLib)
+
+add_test(test_me riscvTest)
