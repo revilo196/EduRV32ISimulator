@@ -19,16 +19,31 @@ set(CMAKE_ASM_COMPILER ${tools}/bin/riscv32-unknown-elf-gcc)
 set(LINKER_SCRIPT "riscv-emu.ld")
 set ( CMAKE_C_FLAGS "-ffreestanding -O0 -Wl,--gc-sections -nostartfiles -Wl,-T,${CMAKE_CURRENT_SOURCE_DIR}/${LINKER_SCRIPT} ")
 
+
+set(TEST_SOURCES
+        test/add.c
+        test/add_double.c
+        test/basic.c
+        test/env_call.c
+        test/gcc_mul.c
+        test/mul.c
+        test/serial.c
+        test/sqare_mul.c
+        )
+
 set(DRIVER_SRC
-    driver/SerialPortDriver.c
-    driver/SerialPortDriver.h
+        driver/SerialPortDriver.c
+        driver/SerialPortDriver.h
+        driver/ecall.h
+        driver/ecall.s
 )
 
 set(STARTUP_SRC
-    crt0.s
+        crt0.s
+        trap.s
+        interrupts.s
         )
 
-file( GLOB TEST_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} test/*.c )
 SET(TEST_NAMES "")
 foreach( testsourcefile  ${TEST_SOURCES} )
     # I used a simple string replace, to cut off .cpp.
