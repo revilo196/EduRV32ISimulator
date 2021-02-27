@@ -36,4 +36,4 @@ add_dependencies(riscvTest risc-native-test)
 target_link_libraries(riscvTest gtest)
 target_link_libraries(riscvTest riscvLib)
 
-#add_test(test_me riscvTest)
+add_test(test_me riscvTest)
