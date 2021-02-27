@@ -97,6 +97,7 @@ TEST_F(RISCVTimerTest, Timer_interrupt_toCPU) {
     //given timer == 0;
     // timecmp ==0
     csr[CSR_MTVEC] = 0xBEEB;   //set trap vector
+    csr[CSR_MSTATUS] |= 8;      // MSTATUS enalbe interrupts
     csr[CSR_MIE] = 0xFFFFFFFF; //enalbe alle interrupts
     this->attach_cpu(this);
 

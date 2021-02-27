@@ -11,6 +11,7 @@ public:
 TEST_F(InterruptTest, Software_Interput_TEST) {
 
     csr[CSR_MTVEC] = 0xBEEB;   //set trap vector
+    csr[CSR_MSTATUS] |= 8;      // MSTATUS enalbe interrupts
     csr[CSR_MIE] = 0xFFFFFFFF; //enalbe alle interrupts
     pc = 0x80000000;
 

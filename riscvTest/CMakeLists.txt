@@ -29,7 +29,7 @@ add_subdirectory(${CMAKE_CURRENT_BINARY_DIR}/googletest-src
 
 add_subdirectory(riscv-elf)
 
-add_executable( riscvTest main_test.cpp test_alu.cpp test_basics.cpp test_load.cpp test_store.cpp test_branch.cpp test_jump.cpp test_utype.cpp RiscCpuBaseTest.h test_integration.cpp test_csregister.cpp test_riscvTimer.cpp test_interrupts.cpp)
+add_executable( riscvTest main_test.cpp test_alu.cpp test_basics.cpp test_load.cpp test_store.cpp test_branch.cpp test_jump.cpp test_utype.cpp RiscCpuBaseTest.h test_integration.cpp test_csregister.cpp test_riscvTimer.cpp test_interrupts.cpp test_interruptIntegraion.cpp)
 add_dependencies( riscvTest riscvLib )
 add_dependencies(riscvTest gtest)
 add_dependencies(riscvTest risc-native-test)

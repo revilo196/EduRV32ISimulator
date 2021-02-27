@@ -53,7 +53,7 @@ void RISCVCpu::execute(Instruction i) {
         return;
     }
 
-    if ( !(o == JAL || o == JALR || o == BRANCH) ) {
+    if ( !(o == JAL || o == JALR || o == BRANCH || (o == CSR && (i.i.imm == 0x302)) ) ) {
         pc+=4; //increment pc if not branch or jump
     }
     x[0] = 0; //r0 is always 0
@@ -327,22 +327,23 @@ iec RISCVCpu::csr_instr(iType csri) {
 
 int RISCVCpu::check_local_interrupt() {
 
-    uint32_t mip = csr[CSR_MIP];
-    uint32_t mie = csr[CSR_MIE];
-    mip = (mip & mie);
+    if ((csr[CSR_MSTATUS] & 8) > 0) { //Status enables interrupts
+        uint32_t mip = csr[CSR_MIP];
+        uint32_t mie = csr[CSR_MIE];
+        mip = (mip & mie);
 
-    switch (mip) {
-        case 1<<3:
-            run_interrupt(false, 3);  //Software interrupt
-            return 1;
-        case 1<<7:
-            run_interrupt(false, 7);  //Timer interrupt
-            return 1;
-        case 1<<11:
-            run_interrupt(false, 11);  //External interrupt
-            return 1;
+        switch (mip) {
+            case 1 << 3:
+                run_interrupt(false, 3);  //Software interrupt
+                return 1;
+            case 1 << 7:
+                run_interrupt(false, 7);  //Timer interrupt
+                return 1;
+            case 1 << 11:
+                run_interrupt(false, 11);  //External interrupt
+                return 1;
+        }
     }
-
 
     return 0;
 
@@ -353,7 +354,7 @@ void RISCVCpu::interrupt(bool exp, uint32_t interrupt_cause) {
         exception(static_cast<InstructionExceptionCode>(interrupt_cause));
     } else {
 
-        csr[CSR_MIP] = 1 << interrupt_cause; //set pending bit
+        csr[CSR_MIP] |= (1 << interrupt_cause); //set pending bit
         check_local_interrupt(); // does the check for mie filter and executes the interrupt
     }
 

@@ -29,6 +29,8 @@ set(TEST_SOURCES
         test/mul.c
         test/serial.c
         test/sqare_mul.c
+        test/timer_intr.c
+        test/sw_trap.c
         )
 
 set(DRIVER_SRC
@@ -36,12 +38,15 @@ set(DRIVER_SRC
         driver/SerialPortDriver.h
         driver/ecall.h
         driver/ecall.s
-)
+        driver/interrupts.h
+        driver/interrupts.s
+        driver/HardwareTimer.h
+        )
 
 set(STARTUP_SRC
         crt0.s
         trap.s
-        interrupts.s
+
         )
 
 SET(TEST_NAMES "")

@@ -27,7 +27,7 @@ int RISCVTimer::update(){
     timespec ts{};
     clock_gettime(CLOCK_MONOTONIC, &ts);
     uint64_t current = ts.tv_nsec/64 + (ts.tv_sec*1000000000/64);
-    uint64_t inc = - lastUpdateTime;
+    uint64_t inc = current - lastUpdateTime;
     lastUpdateTime = current;
     mem.mtime+= inc;
 
