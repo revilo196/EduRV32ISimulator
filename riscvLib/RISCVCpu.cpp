@@ -42,12 +42,14 @@ iec RISCVCpu::run_instruction(Instruction i) {
 void RISCVCpu::execute(Instruction i) {
     auto o = (Opcode)i.d.opcode;
 
-    check_local_interrupt();
+    if(check_local_interrupt() >0 ) {
+        return;
+    }
 
-    iec exept = run_instruction(i);
+    iec except = run_instruction(i);
 
-    if (exept!= iec::IEC_OK) {
-        exception(exept);
+    if (except!= iec::IEC_OK) {
+        exception(except);
         return;
     }
 
@@ -55,10 +57,11 @@ void RISCVCpu::execute(Instruction i) {
         pc+=4; //increment pc if not branch or jump
     }
     x[0] = 0; //r0 is always 0
+
 }
 
 void RISCVCpu::exception(InstructionExceptionCode code) {
-
+    run_interrupt(true,code);
 }
 
 
@@ -99,13 +102,24 @@ void RISCVCpu::resetCpu() {
     for (int i = 0; i < 32; ++i) {
         x[0] = 0;
     }
+
+    for (unsigned int & i : csr) {
+        i = 0;
+    }
     pc = 0;
 }
 
 void RISCVCpu::single_step() {
     Instruction  i = fetch();
     execute(i);
+
+    instuction_count = (uint64_t)csr[CSR_MCYCLEH] << 32 | csr[CSR_MCYCLE];
     instuction_count++;
+    csr[CSR_MCYCLEH] = instuction_count >> 32;
+    csr[CSR_MCYCLE] = instuction_count;
+    csr[CSR_MINSTRET]++;
+    if(csr[CSR_MINSTRET] == 0) {csr[CSR_MINSTRET]++; }
+
 }
 
 iec RISCVCpu::store(sType si) {
@@ -246,11 +260,12 @@ iec RISCVCpu::branch(bType bi) {
     }
 }
 
-void RISCVCpu::interrupt(bool exeption, uint32_t interrupt_cause) {
+void RISCVCpu::run_interrupt(bool exeption, uint32_t interrupt_cause) {
 
     uint32_t m_cause = interrupt_cause | (exeption << 31);
-    csr[CSR_MSCRATCH] = r_sp;
     csr[CSR_MEPC] = pc;
+    iescratch = csr[CSR_MIE];
+    csr[CSR_MIE] = 0;
     csr[CSR_MSCAUSE] = m_cause;
     pc = csr[CSR_MTVEC];
 
@@ -262,7 +277,9 @@ iec RISCVCpu::csr_instr(iType csri) {
     auto f3 = (F3_System)csri.func3;
     switch (f3) {
         case F3_System::ECALL:
-            if(csri.imm == 1) { pc = 0; } //stop program  //EBREAK
+            if(csri.imm == 1) { pc = 0; return iec::IEC_OK;} //stop program  // EBREAK
+            if(csri.imm == 0x302  ) {pc = csr[CSR_MEPC]; csr[CSR_MIE] = iescratch; return iec::IEC_OK;} // MRET
+            pc += 4;
             return iec::ECALL_M;
 
         case F3_System::CSR_RW:
@@ -312,18 +329,32 @@ int RISCVCpu::check_local_interrupt() {
 
     uint32_t mip = csr[CSR_MIP];
     uint32_t mie = csr[CSR_MIE];
-    mip &= mie;
+    mip = (mip & mie);
 
     switch (mip) {
         case 1<<3:
-            interrupt(false, 3);  //Software interrupt
-            break;
+            run_interrupt(false, 3);  //Software interrupt
+            return 1;
         case 1<<7:
-            interrupt(false, 7);  //Timer interrupt
-            break;
+            run_interrupt(false, 7);  //Timer interrupt
+            return 1;
         case 1<<11:
-            interrupt(false, 11);  //External interrupt
-            break;
+            run_interrupt(false, 11);  //External interrupt
+            return 1;
+    }
+
+
+    return 0;
+
+}
+
+void RISCVCpu::interrupt(bool exp, uint32_t interrupt_cause) {
+    if (exp) {
+        exception(static_cast<InstructionExceptionCode>(interrupt_cause));
+    } else {
+
+        csr[CSR_MIP] = 1 << interrupt_cause; //set pending bit
+        check_local_interrupt(); // does the check for mie filter and executes the interrupt
     }
 
 

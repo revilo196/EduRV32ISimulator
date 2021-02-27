@@ -41,12 +41,17 @@ private:
     uint32_t read_io(F3_LoadOp op, uint32_t addr, iec& excep ) ;
     iec write_io(F3_StoreOp op, uint32_t addr, uint32_t value);
 
+    //run inerrupt
+    void run_interrupt(bool exeption, uint32_t interrupt_cause);
+
+
 protected:
     RISCVMemory * memory;
     std::vector<MemoryMappedIO*> mmio;
+    uint32_t iescratch;
     uint32_t x[32]{};
     uint32_t pc{};
-    uint32_t instuction_count{};
+    uint64_t instuction_count{};
     uint32_t csr[0x1000];
     Instruction fetch();
     virtual iec run_instruction(Instruction i);
@@ -54,16 +59,16 @@ protected:
     void execute(Instruction i);
     void exception(InstructionExceptionCode code);
     int check_local_interrupt();
-    void interrupt(bool exeption, uint32_t interrupt_cause);
 
 
 public:
+    void interrupt(bool exeption, uint32_t interrupt_cause);
     explicit RISCVCpu(RISCVMemory* mem)  {this->memory = mem;}
     void resetCpu();
     void single_step();
     void entry(uint32_t pc_start) { this->pc = pc_start;}
     uint32_t getPC() const {return pc;}
-    void add_mmio(MemoryMappedIO * m) {mmio.push_back(m);}
+    void add_mmio(MemoryMappedIO * m) {mmio.push_back(m); m->attach_cpu(this);}
 
 
 

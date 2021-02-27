@@ -82,6 +82,10 @@
 #define CSR_MSCAUSE      0x342
 #define CSR_MTVAL       0x343
 #define CSR_MIP         0x344
+#define CSR_MCYCLE      0xB00
+#define CSR_MCYCLEH     0xB80
+#define CSR_MINSTRET    0xB02
+#define CSR_MINSTRETH    0xB82
 
 typedef struct mix_s_ {
     bool usix : 1;

@@ -7,6 +7,8 @@
 #include <cstdint>
 #include "instructions.h"
 
+class RISCVCpu;
+
 /**
  * MemoryMappedIO describes an Abstract class to read or write into a MemoryMapped device
  *
@@ -15,6 +17,8 @@ class MemoryMappedIO {
 private:
     uint32_t minAdr;
     uint32_t maxAdr;
+protected:
+    RISCVCpu * cpu;
 public:
     /**
      * Constructor that sets the min and max memory range of the device
@@ -22,7 +26,7 @@ public:
      * @param start memory address start of the device
      * @param end memory address end of the device
      */
-    MemoryMappedIO(uint32_t start, uint32_t end) {minAdr = start; maxAdr=end;}
+    MemoryMappedIO(uint32_t start, uint32_t end) {minAdr = start; maxAdr=end; cpu= nullptr;}
 
     /**
      * reading from a MemoryMappedIO device
@@ -46,6 +50,12 @@ public:
      * @return true if the device contains this address else false
      */
     bool in_device(uint32_t adr)  {return  minAdr <= adr && adr <= maxAdr; }
+
+    /**
+     * attach a pCpu to this device to handle callbacks to pCpu like interrupts
+     * @param pCpu
+     */
+    void attach_cpu(RISCVCpu * pCpu) { this->cpu = pCpu;}
 
 };
 

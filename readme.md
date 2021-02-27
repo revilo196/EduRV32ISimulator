@@ -8,11 +8,18 @@ understanding the architecture and hardware.
 - Loading/Run a rv32i elf executable (with some special compile options)
 - SerialPort simulation simple char output
 - all rv32i instructions
+- machine mode only
 
 ## In Progress:
 - exceptions and interrupts
 - CSR registers
 - Hardware timer & interrupt
+- Hardware timer pending reset (currently target software reset)
+- many RO / RW CSR constrains
+  
+## Planning 
+- supervisor and user modes
+- A and M extension instructions
 - better (graphical) device options
 
 ## Goal

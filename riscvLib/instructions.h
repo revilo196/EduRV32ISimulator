@@ -145,4 +145,6 @@ enum InstructionExceptionCode {IEC_OK = -1, Inst_Misaligned = 0, Inst_AccessFaul
 
 typedef InstructionExceptionCode iec;
 
+#define NOP_INST  {ALU_IMM,0,A_ADD,0,0};
+
 #endif //OW_RISCV_EMU_INSTRUCTIONS_H
