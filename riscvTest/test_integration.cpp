@@ -124,24 +124,27 @@ uint32_t testpc = 0;
 
 bool testbreak_pc(uint32_t i) {return  testpc == i;}
 
+
 TEST_F(IntegrationTest, OSTest){
 
+    //lets 2 cooperative tasks count against each other
     auto * mem = new SingleElfMemory("riscv-elf/os_test.rv32", MB(64));
     this->memory = mem;
     entry(mem->entry);
 
-    std::vector<uint32_t> breakpoints = {0x0, 0x84000030, 0x84000080, 0x840000a4, 0x8400009c, 0x840000c0};
-
+    std::vector<uint32_t> breakpoints = {0x0, 0x84000030, 0x84000080, 0x840000a4, 0x8400009c, 0x840000c0, 0x840004fc};
+    int counter = 0;
     while (pc != 0x00) {
         testpc = pc;
-        if(std::any_of( breakpoints.begin(), breakpoints.end(), &testbreak_pc )) {
+      /*  if(std::any_of( breakpoints.begin(), breakpoints.end(), &testbreak_pc )) {
             GTEST_COUT << "BREAKPOINT" << std::endl;
-        }
+        }*/
 
         single_step();
+        if(++counter > 1000000) {break;}
     }
 
     INFO_INSTRUCT(instuction_count);
-    ASSERT_EQ(x[10],123);
+    ASSERT_LE(mem->read32(0x84000ad0),1);
     delete mem;
 }

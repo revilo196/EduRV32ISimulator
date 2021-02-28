@@ -17,7 +17,7 @@ set(CMAKE_CXX_COMPILER ${tools}/bin/riscv32-unknown-elf-g++)
 set(CMAKE_ASM_COMPILER ${tools}/bin/riscv32-unknown-elf-gcc)
 
 set(LINKER_SCRIPT "riscv-emu.ld")
-set ( CMAKE_C_FLAGS "-ffreestanding -O2 -Wl,--gc-sections -nostartfiles -Wl,-T,${CMAKE_CURRENT_SOURCE_DIR}/${LINKER_SCRIPT} ")
+set ( CMAKE_C_FLAGS "-ffreestanding -O0 -Wl,--gc-sections -nostartfiles -Wl,-T,${CMAKE_CURRENT_SOURCE_DIR}/${LINKER_SCRIPT} ")
 
 
 set(TEST_SOURCES

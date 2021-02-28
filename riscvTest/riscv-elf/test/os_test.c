@@ -4,7 +4,7 @@
 
 #include "rvos.h"
 
-int data = 0;
+volatile int data = 1;
 
 void task0 (int32_t argc, int32_t arcv []) {
     halt(123,321);
@@ -20,7 +20,7 @@ _Noreturn void task1 (int32_t argc, int32_t arcv []) {
 
 _Noreturn void task2(int32_t argc, int32_t arcv []) {
     while (1) {
-        data --;
+        data--;
         yield();
     }
 }
