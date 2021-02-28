@@ -10,21 +10,21 @@ clear_mip:
 
 _trap:
         addi    sp, sp, -64    #save all temporary register on stack
-        sw      ra, 60(sp)
-        sw      t0, 56(sp)
-        sw      t1, 52(sp)
-        sw      t2, 48(sp)
-        sw      a0, 44(sp)
-        sw      a1, 40(sp)
-        sw      a2, 36(sp)
+        sw      ra, 4(sp)
+        sw      t0, 8(sp)
+        sw      t1, 12(sp)
+        sw      t2, 16(sp)
+        sw      a0, 20(sp)
+        sw      a1, 24(sp)
+        sw      a2, 28(sp)
         sw      a3, 32(sp)
-        sw      a4, 28(sp)
-        sw      a5, 24(sp)
-        sw      a6, 20(sp)
-        sw      a7, 16(sp)
-        sw      t3, 12(sp)
-        sw      t4, 8(sp)
-        sw      t5, 4(sp)
+        sw      a4, 36(sp)
+        sw      a5, 40(sp)
+        sw      a6, 44(sp)
+        sw      a7, 48(sp)
+        sw      t3, 52(sp)
+        sw      t4, 56(sp)
+        sw      t5, 60(sp)
 
         la    ra, _trap_exit            # return point for handlers
         csrrc  t0, mcause, zero
@@ -41,21 +41,21 @@ _trap:
         j exceptionHandler
 
 _trap_exit:
-        lw      ra, 60(sp)   # load temporary registers back from stack
-        lw      t0, 56(sp)
-        lw      t1, 52(sp)
-        lw      t2, 48(sp)
-        lw      a0, 44(sp)
-        lw      a1, 40(sp)
-        lw      a2, 36(sp)
+        lw      ra, 4(sp)    # load temporary registers back from stack
+        lw      t0, 8(sp)
+        lw      t1, 12(sp)
+        lw      t2, 16(sp)
+        lw      a0, 20(sp)
+        lw      a1, 24(sp)
+        lw      a2, 28(sp)
         lw      a3, 32(sp)
-        lw      a4, 28(sp)
-        lw      a5, 24(sp)
-        lw      a6, 20(sp)
-        lw      a7, 16(sp)
-        lw      t3, 12(sp)
-        lw      t4, 8(sp)
-        lw      t5, 4(sp)
+        lw      a4, 36(sp)
+        lw      a5, 40(sp)
+        lw      a6, 44(sp)
+        lw      a7, 48(sp)
+        lw      t3, 52(sp)
+        lw      t4, 56(sp)
+        lw      t5, 60(sp)
         addi    sp, sp, 64  # stackpointer should be the same as before the trap
         mret
 

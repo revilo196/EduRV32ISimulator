@@ -6,6 +6,8 @@
 #include "cmath"
 #include "SerialPort.h"
 #define INFO_INSTRUCT(ic)  GTEST_COUT << "Competed after " <<  ic << " instructions" << std::endl
+#include <algorithm>    // std::any_of
+#include "register.h"
 
 class IntegrationTest : public testing::Test, public RISCVCpu{
 public:
@@ -115,5 +117,31 @@ TEST_F(IntegrationTest, SerialDiverTest){
 
     INFO_INSTRUCT(instuction_count);
     ASSERT_EQ(x[10],96);
+    delete mem;
+}
+
+uint32_t testpc = 0;
+
+bool testbreak_pc(uint32_t i) {return  testpc == i;}
+
+TEST_F(IntegrationTest, OSTest){
+
+    auto * mem = new SingleElfMemory("riscv-elf/os_test.rv32", MB(64));
+    this->memory = mem;
+    entry(mem->entry);
+
+    std::vector<uint32_t> breakpoints = {0x0, 0x84000030, 0x84000080, 0x840000a4, 0x8400009c, 0x840000c0};
+
+    while (pc != 0x00) {
+        testpc = pc;
+        if(std::any_of( breakpoints.begin(), breakpoints.end(), &testbreak_pc )) {
+            GTEST_COUT << "BREAKPOINT" << std::endl;
+        }
+
+        single_step();
+    }
+
+    INFO_INSTRUCT(instuction_count);
+    ASSERT_EQ(x[10],123);
     delete mem;
 }

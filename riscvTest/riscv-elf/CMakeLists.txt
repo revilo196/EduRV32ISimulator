@@ -17,7 +17,7 @@ set(CMAKE_CXX_COMPILER ${tools}/bin/riscv32-unknown-elf-g++)
 set(CMAKE_ASM_COMPILER ${tools}/bin/riscv32-unknown-elf-gcc)
 
 set(LINKER_SCRIPT "riscv-emu.ld")
-set ( CMAKE_C_FLAGS "-ffreestanding -O0 -Wl,--gc-sections -nostartfiles -Wl,-T,${CMAKE_CURRENT_SOURCE_DIR}/${LINKER_SCRIPT} ")
+set ( CMAKE_C_FLAGS "-ffreestanding -O2 -Wl,--gc-sections -nostartfiles -Wl,-T,${CMAKE_CURRENT_SOURCE_DIR}/${LINKER_SCRIPT} ")
 
 
 set(TEST_SOURCES
@@ -31,7 +31,16 @@ set(TEST_SOURCES
         test/sqare_mul.c
         test/timer_intr.c
         test/sw_trap.c
+        test/os_test.c
         )
+
+set(RVOS_SRC
+        os/rvos_types.h
+        os/rvos.c
+        os/ring_ready_list.h
+        os/ring_ready_list.c
+        os/rvos.h
+        os/rvos.s)
 
 set(DRIVER_SRC
         driver/SerialPortDriver.c
@@ -55,8 +64,10 @@ foreach( testsourcefile  ${TEST_SOURCES} )
     string( REPLACE "test/" "" testnameA ${testsourcefile} )
     string( REPLACE ".c" ".rv32" testname ${testnameA} )
 
-    add_executable( ${testname} ${testsourcefile} ${STARTUP_SRC} ${DRIVER_SRC})
+    add_executable( ${testname} ${testsourcefile} ${STARTUP_SRC} ${DRIVER_SRC} ${RVOS_SRC})
     target_include_directories( ${testname} PRIVATE driver)
+    target_include_directories( ${testname} PRIVATE os)
+
     LIST(APPEND TEST_NAMES  "${testname}")
     MESSAGE(${TEST_NAMES})
     # Make sure YourLib is linked to each app
